@@ -3,153 +3,12 @@
 import { motion } from "framer-motion";
 import { useCallback, useState, type ReactNode } from "react";
 
-const TOOLS = [
-  { name: "brush", icon: Paintbrush, shortcut: "B" },
-  { name: "eraser", icon: Eraser, shortcut: "E" },
-  { name: "rectangle", icon: Square, shortcut: "R" },
-  { name: "circle", icon: Circle, shortcut: "C" },
-];
-
-const DRAWER = [
-  { item: "color", icon: Palette, title: "Color Palette" },
-  { item: "settings", icon: Settings, title: "Tool Settings" },
-  { item: "layers", icon: Layers, title: "Layers" },
-  {
-    item: "background",
-    icon: Palette,
-    title: "Background Color",
-    iconProps: { className: "fill-yellow-100" },
-  },
-];
-
-type DrawerItem = (typeof DRAWER)[number]["item"];
-
-const CanvasKit = () => {
-  // Canvas state
-  const [tool, setTool] = useState<(typeof TOOLS)[number]["name"]>("brush");
-  // const [color, setColor] = useState("#000000");
-  // const [brushSize, setBrushSize] = useState(5);
-  // const [eraserSize, setEraserSize] = useState(10);
-  // const [opacity, setOpacity] = useState(1);
-  // const [backgroundColor, setBackgroundColor] = useState("#ffffff");
-
-  // Drawer state
-  const [activeDrawer, setActiveDrawer] = useState<DrawerItem | null>(null);
-  const [previousDrawer, setPreviousDrawer] = useState<DrawerItem | null>(null);
-
-  // Tool selection
-  const selectTool = useCallback(
-    (selectedTool: (typeof TOOLS)[number]["name"]) => {
-      setTool(selectedTool);
-    },
-    [],
-  );
-
-  // Handle drawer open/close
-  const openDrawer = (
-    drawer: DrawerItem,
-    fromDrawer: DrawerItem | null = null,
-  ) => {
-    if (activeDrawer && fromDrawer === null) {
-      setPreviousDrawer(activeDrawer);
-    } else if (fromDrawer) {
-      setPreviousDrawer(fromDrawer);
-    }
-    setActiveDrawer(drawer);
-  };
-  const closeDrawer = () => {
-    setActiveDrawer(null);
-    setPreviousDrawer(null);
-  };
-
-  // Clear canvas
-  const clearCanvas = () => {
-    // TODO: Implement clear canvas functionality
-  };
-
-  return (
-    <div className="flex h-screen flex-col bg-gray-50">
-      {/* Navbar */}
-      <header className="border-b border-gray-200 bg-white px-4 py-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-purple-500">
-              <Paintbrush size={18} className="text-white" />
-            </div>
-            <h1 className="text-xl font-bold text-gray-800">Canvas Kit</h1>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              // onClick={saveAsImage}
-              className="flex items-center gap-1.5 rounded-lg bg-blue-500 px-3 py-1.5 text-white transition-colors hover:bg-blue-600"
-            >
-              <Download size={16} />
-              <span>Save Image</span>
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="flex flex-1 flex-col overflow-hidden md:flex-row">
-        {/* Left Toolbar */}
-        <div className="flex justify-center gap-2 overflow-x-auto border-r border-gray-200 bg-white p-2 md:flex-col md:justify-start md:overflow-y-auto">
-          {TOOLS.map((item) => (
-            <button
-              key={item.name}
-              onClick={() => selectTool(item.name)}
-              className={`rounded-lg p-3 ${
-                tool === item.name
-                  ? "bg-blue-100 text-blue-600"
-                  : "text-gray-700 hover:bg-gray-100"
-              } transition-colors`}
-              title={`${item.name.charAt(0).toUpperCase() + item.name.slice(1)} Tool (${item.shortcut})`}
-            >
-              <item.icon size={20} />
-            </button>
-          ))}
-
-          <Separator />
-
-          {DRAWER.map((drawer) => (
-            <button
-              key={drawer.item}
-              onClick={() => openDrawer(drawer.item)}
-              className={`rounded-lg p-3 ${
-                activeDrawer === drawer.item
-                  ? "bg-blue-100 text-blue-600"
-                  : "text-gray-700 hover:bg-gray-100"
-              } transition-colors`}
-              title={drawer.title}
-            >
-              <drawer.icon size={20} {...(drawer.iconProps ?? {})} />
-            </button>
-          ))}
-
-          <Separator />
-
-          <button
-            onClick={clearCanvas}
-            className="rounded-lg p-3 text-gray-700 transition-colors hover:bg-gray-100"
-            title="Clear Canvas"
-          >
-            <Trash2 size={20} />
-          </button>
-        </div>
-      </main>
-    </div>
-  );
-};
-
-export default CanvasKit;
-
 // ////////////////////////////// Components ////////////////////////////// //
-
 const Separator = () => {
   return <div className="my-2 hidden h-px w-full bg-gray-200 md:block" />;
 };
 
+// ////////////////////////////// Drawer ////////////////////////////// //
 type DrawerProps = {
   isOpen: boolean;
   onClose: () => void;
@@ -210,12 +69,60 @@ const Drawer = ({
   );
 };
 
+// ////////////////////////////// Color Palette ////////////////////////////// //
+type ColorPaletteProps = {
+  color: string;
+  setColor: (color: string) => void;
+  colorPalette: string[];
+};
+const ColorPalette = ({}: ColorPaletteProps) => {
+  return <div>Color Palette</div>;
+};
+
+// ////////////////////////////// Background Color ////////////////////////////// //
+type BackgroundColorProps = {
+  backgroundColor: string;
+  setBackgroundColor: (color: string) => void;
+};
+const BackgroundColor = ({}: BackgroundColorProps) => {
+  return <div>Background Color</div>;
+};
+
+// ////////////////////////////// Layers ////////////////////////////// //
+type LayersPanelProps = {
+  layers: string[];
+  activeLayer: string;
+  setActiveLayer: (layer: string) => void;
+  toggleLayerVisibility: (layer: string) => void;
+  removeLayer: (layer: string) => void;
+  addLayer: () => void;
+  backgroundColor: string;
+  openBackgroundColorDrawer: () => void;
+};
+const LayersPanel = ({}: LayersPanelProps) => {
+  return <div>Layers</div>;
+};
+
+// ////////////////////////////// Tool Settings ////////////////////////////// //
+type ToolSettingsProps = {
+  tool: string;
+  brushSize: number;
+  setBrushSize: (size: number) => void;
+  eraserSize: number;
+  setEraserSize: (size: number) => void;
+  opacity: number;
+  setOpacity: (opacity: number) => void;
+};
+const ToolSettings = ({}: ToolSettingsProps) => {
+  return <div>Tool Settings</div>;
+};
+
 // ////////////////////////////// All the required icons ////////////////////////////// //
 interface IconProps {
   size?: number;
   className?: string;
 }
-function Circle({ size = 24, className = "" }: IconProps) {
+const Circle = ({ size = 24, className = "" }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -232,8 +139,8 @@ function Circle({ size = 24, className = "" }: IconProps) {
       <circle cx="12" cy="12" r="10" />
     </svg>
   );
-}
-function Download({ size = 24, className = "" }: IconProps) {
+};
+const Download = ({ size = 24, className = "" }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -252,8 +159,8 @@ function Download({ size = 24, className = "" }: IconProps) {
       <line x1="12" y1="15" x2="12" y2="3" />
     </svg>
   );
-}
-function Eraser({ size = 24, className = "" }: IconProps) {
+};
+const Eraser = ({ size = 24, className = "" }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -272,8 +179,8 @@ function Eraser({ size = 24, className = "" }: IconProps) {
       <path d="m5 11 9 9" />
     </svg>
   );
-}
-function Layers({ size = 24, className = "" }: IconProps) {
+};
+const Layers = ({ size = 24, className = "" }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -292,8 +199,8 @@ function Layers({ size = 24, className = "" }: IconProps) {
       <polyline points="2 12 12 17 22 12" />
     </svg>
   );
-}
-function Paintbrush({ size = 24, className = "" }: IconProps) {
+};
+const Paintbrush = ({ size = 24, className = "" }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -312,8 +219,8 @@ function Paintbrush({ size = 24, className = "" }: IconProps) {
       <path d="M14.5 17.5 4.5 15" />
     </svg>
   );
-}
-function Palette({ size = 24, className = "" }: IconProps) {
+};
+const Palette = ({ size = 24, className = "" }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -334,8 +241,8 @@ function Palette({ size = 24, className = "" }: IconProps) {
       <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" />
     </svg>
   );
-}
-function Settings({ size = 24, className = "" }: IconProps) {
+};
+const Settings = ({ size = 24, className = "" }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -353,8 +260,8 @@ function Settings({ size = 24, className = "" }: IconProps) {
       <circle cx="12" cy="12" r="3" />
     </svg>
   );
-}
-function Square({ size = 24, className = "" }: IconProps) {
+};
+const Square = ({ size = 24, className = "" }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -371,8 +278,8 @@ function Square({ size = 24, className = "" }: IconProps) {
       <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
     </svg>
   );
-}
-function Trash2({ size = 24, className = "" }: IconProps) {
+};
+const Trash2 = ({ size = 24, className = "" }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -393,8 +300,8 @@ function Trash2({ size = 24, className = "" }: IconProps) {
       <line x1="14" y1="11" x2="14" y2="17" />
     </svg>
   );
-}
-function Eye({ size = 24, className = "" }: IconProps) {
+};
+const Eye = ({ size = 24, className = "" }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -412,8 +319,8 @@ function Eye({ size = 24, className = "" }: IconProps) {
       <circle cx="12" cy="12" r="3" />
     </svg>
   );
-}
-function EyeOff({ size = 24, className = "" }: IconProps) {
+};
+const EyeOff = ({ size = 24, className = "" }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -433,8 +340,8 @@ function EyeOff({ size = 24, className = "" }: IconProps) {
       <line x1="2" x2="22" y1="2" y2="22" />
     </svg>
   );
-}
-function Plus({ size = 24, className = "" }: IconProps) {
+};
+const Plus = ({ size = 24, className = "" }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -452,8 +359,8 @@ function Plus({ size = 24, className = "" }: IconProps) {
       <line x1="5" y1="12" x2="19" y2="12" />
     </svg>
   );
-}
-function X({ size = 24, className = "" }: IconProps) {
+};
+const X = ({ size = 24, className = "" }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -471,8 +378,8 @@ function X({ size = 24, className = "" }: IconProps) {
       <line x1="6" y1="6" x2="18" y2="18" />
     </svg>
   );
-}
-function ChevronLeft({ size = 24, className = "" }: IconProps) {
+};
+const ChevronLeft = ({ size = 24, className = "" }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -489,4 +396,255 @@ function ChevronLeft({ size = 24, className = "" }: IconProps) {
       <path d="m15 18-6-6 6-6" />
     </svg>
   );
-}
+};
+
+// ////////////////////////////// Constants ////////////////////////////// //
+const TOOLS = [
+  { name: "brush", icon: Paintbrush, shortcut: "B" },
+  { name: "eraser", icon: Eraser, shortcut: "E" },
+  { name: "rectangle", icon: Square, shortcut: "R" },
+  { name: "circle", icon: Circle, shortcut: "C" },
+];
+const DRAWER_ITEMS = [
+  { item: "color", icon: Palette, title: "Color Palette" },
+  { item: "settings", icon: Settings, title: "Tool Settings" },
+  { item: "layers", icon: Layers, title: "Layers" },
+  {
+    item: "background",
+    icon: Palette,
+    title: "Background Color",
+    iconProps: { className: "fill-yellow-100" },
+  },
+];
+const colorPalette = [
+  // Row 1 - Grayscale
+  "#000000",
+  "#444444",
+  "#666666",
+  "#888888",
+  "#AAAAAA",
+  "#CCCCCC",
+  "#FFFFFF",
+  // Row 2 - Light colors
+  "#FFAAAA",
+  "#FFFFAA",
+  "#AAFFAA",
+  "#AAFFFF",
+  "#AAAAFF",
+  "#FFAAFF",
+  "#FFCCAA",
+  // Row 3 - Medium colors
+  "#FF5555",
+  "#FFFF55",
+  "#55FF55",
+  "#55FFFF",
+  "#5555FF",
+  "#FF55FF",
+  "#FFAA55",
+  // Row 4 - Dark colors
+  "#FF0000",
+  "#FFFF00",
+  "#00FF00",
+  "#00FFFF",
+  "#0000FF",
+  "#FF00FF",
+  "#FF8800",
+];
+
+// ////////////////////////////// Types ////////////////////////////// //
+type DrawerItem = (typeof DRAWER_ITEMS)[number]["item"];
+
+// ////////////////////////////// Main Component ////////////////////////////// //
+const CanvasKit = () => {
+  // Canvas state
+  const [tool, setTool] = useState<(typeof TOOLS)[number]["name"]>("brush");
+  const [color, setColor] = useState("#000000");
+  const [brushSize, setBrushSize] = useState(5);
+  const [eraserSize, setEraserSize] = useState(10);
+  const [opacity, setOpacity] = useState(1);
+  const [backgroundColor, setBackgroundColor] = useState("#ffffff");
+
+  // Drawer state
+  const [activeDrawer, setActiveDrawer] = useState<DrawerItem | null>(null);
+  const [previousDrawer, setPreviousDrawer] = useState<DrawerItem | null>(null);
+
+  // Tool selection
+  const selectTool = useCallback(
+    (selectedTool: (typeof TOOLS)[number]["name"]) => {
+      setTool(selectedTool);
+    },
+    [],
+  );
+
+  // Handle drawer open/close
+  const openDrawer = (
+    drawer: DrawerItem,
+    fromDrawer: DrawerItem | null = null,
+  ) => {
+    if (activeDrawer && fromDrawer === null) {
+      setPreviousDrawer(activeDrawer);
+    } else if (fromDrawer) {
+      setPreviousDrawer(fromDrawer);
+    }
+    setActiveDrawer(drawer);
+  };
+
+  // Create drawer content with access to state
+  const DRAWER = DRAWER_ITEMS.map((item) => {
+    let content;
+
+    if (item.item === "color") {
+      content = (
+        <ColorPalette
+          color={color}
+          setColor={setColor}
+          colorPalette={colorPalette}
+        />
+      );
+    } else if (item.item === "settings") {
+      content = (
+        <ToolSettings
+          tool={tool}
+          brushSize={brushSize}
+          setBrushSize={setBrushSize}
+          eraserSize={eraserSize}
+          setEraserSize={setEraserSize}
+          opacity={opacity}
+          setOpacity={setOpacity}
+        />
+      );
+    } else if (item.item === "layers") {
+      content = (
+        <LayersPanel
+          layers={[]}
+          activeLayer={""}
+          setActiveLayer={() => {}}
+          toggleLayerVisibility={() => {}}
+          removeLayer={() => {}}
+          addLayer={() => {}}
+          backgroundColor={backgroundColor}
+          openBackgroundColorDrawer={() => openDrawer("background", "layers")}
+        />
+      );
+    } else if (item.item === "background") {
+      content = (
+        <BackgroundColor
+          backgroundColor={backgroundColor}
+          setBackgroundColor={setBackgroundColor}
+        />
+      );
+    }
+
+    return {
+      ...item,
+      content,
+    };
+  });
+  const closeDrawer = () => {
+    setActiveDrawer(null);
+    setPreviousDrawer(null);
+  };
+
+  // Navigate back to previous drawer
+  const navigateBack = () => {
+    if (previousDrawer) {
+      setActiveDrawer(previousDrawer);
+      setPreviousDrawer(null);
+    } else {
+      closeDrawer();
+    }
+  };
+
+  // Clear canvas
+  const clearCanvas = () => {
+    // TODO: Implement clear canvas functionality
+  };
+
+  return (
+    <div className="flex h-screen flex-col bg-gray-50">
+      {/* Navbar */}
+      <header className="border-b border-gray-200 bg-white px-4 py-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-purple-500">
+              <Paintbrush size={18} className="text-white" />
+            </div>
+            <h1 className="text-xl font-bold text-gray-800">Canvas Kit</h1>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              // onClick={saveAsImage}
+              className="flex items-center gap-1.5 rounded-lg bg-blue-500 px-3 py-1.5 text-white transition-colors hover:bg-blue-600"
+            >
+              <Download size={16} />
+              <span>Save Image</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="flex flex-1 flex-col overflow-hidden md:flex-row">
+        {/* Left Toolbar */}
+        <div className="flex justify-center gap-2 overflow-x-auto border-r border-gray-200 bg-white p-2 md:flex-col md:justify-start md:overflow-y-auto">
+          {TOOLS.map((item) => (
+            <button
+              key={item.name}
+              onClick={() => selectTool(item.name)}
+              className={`rounded-lg p-3 ${
+                tool === item.name
+                  ? "bg-blue-100 text-blue-600"
+                  : "text-gray-700 hover:bg-gray-100"
+              } transition-colors`}
+              title={`${item.name.charAt(0).toUpperCase() + item.name.slice(1)} Tool (${item.shortcut})`}
+            >
+              <item.icon size={20} />
+            </button>
+          ))}
+          <Separator />
+
+          {DRAWER.map((drawer) => (
+            <button
+              key={drawer.item}
+              onClick={() => openDrawer(drawer.item)}
+              className={`rounded-lg p-3 ${
+                activeDrawer === drawer.item
+                  ? "bg-blue-100 text-blue-600"
+                  : "text-gray-700 hover:bg-gray-100"
+              } transition-colors`}
+              title={drawer.title}
+            >
+              <drawer.icon size={20} {...(drawer.iconProps ?? {})} />
+            </button>
+          ))}
+          <Separator />
+
+          <button
+            onClick={clearCanvas}
+            className="rounded-lg p-3 text-gray-700 transition-colors hover:bg-gray-100"
+            title="Clear Canvas"
+          >
+            <Trash2 size={20} />
+          </button>
+        </div>
+
+        {/* Drawers */}
+        {DRAWER.map((drawer) => (
+          <Drawer
+            key={drawer.item}
+            isOpen={activeDrawer === drawer.item}
+            onClose={closeDrawer}
+            title={drawer.title}
+            previousDrawer={previousDrawer}
+            onNavigateBack={navigateBack}
+          >
+            {drawer.content}
+          </Drawer>
+        ))}
+      </main>
+    </div>
+  );
+};
+
+export default CanvasKit;
