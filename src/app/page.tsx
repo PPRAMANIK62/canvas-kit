@@ -1323,6 +1323,41 @@ const CanvasKit = () => {
   const [layers, setLayers] = useState<Layer[]>(LAYERS);
   const [activeLayer, setActiveLayer] = useState(2);
 
+  // Layer functions
+  const addLayer = useCallback(() => {
+    const newId = Math.max(...layers.map((l) => l.id)) + 1;
+    const newLayer: Layer = {
+      id: newId,
+      name: `Layer ${newId - 1}`,
+      visible: true,
+      canvas: null,
+      context: null,
+    };
+
+    setLayers([...layers, newLayer]);
+    setActiveLayer(newId);
+  }, [layers]);
+  const toggleLayerVisibility = useCallback(
+    (id: number) => {
+      setLayers(
+        layers.map((layer) =>
+          layer.id === id ? { ...layer, visible: !layer.visible } : layer,
+        ),
+      );
+    },
+    [layers],
+  );
+  const removeLayer = useCallback(
+    (id: number) => {
+      if (layers.length <= 2) return; // Keep at least 2 layers
+      setLayers(layers.filter((layer) => layer.id !== id));
+      if (activeLayer === id) {
+        setActiveLayer(id - 1);
+      }
+    },
+    [layers, activeLayer],
+  );
+
   // Tool selection
   const selectTool = useCallback((selectedTool: ToolItems) => {
     setTool(selectedTool);
@@ -1367,9 +1402,9 @@ const CanvasKit = () => {
           layers={layers}
           activeLayer={activeLayer}
           setActiveLayer={setActiveLayer}
-          toggleLayerVisibility={() => {}}
-          removeLayer={() => {}}
-          addLayer={() => {}}
+          toggleLayerVisibility={toggleLayerVisibility}
+          removeLayer={removeLayer}
+          addLayer={addLayer}
           backgroundColor={backgroundColor}
           openBackgroundColorDrawer={() => openDrawer("background", "layers")}
         />
@@ -1417,7 +1452,20 @@ const CanvasKit = () => {
 
   // Clear canvas
   const clearCanvas = () => {
-    // TODO: Implement clear canvas functionality
+    // Reset background color to default white
+    setBackgroundColor("#ffffff");
+
+    // Create new layers with the same structure but empty canvases
+    const newLayers = layers.map((layer) => {
+      return {
+        ...layer,
+        canvas: null,
+        context: null,
+      };
+    });
+
+    // Update the layers state with the new empty layers
+    setLayers([...newLayers]);
   };
 
   return (
