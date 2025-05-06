@@ -1,7 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useCallback, useState, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 
 // ////////////////////////////// Icons ////////////////////////////// //
 interface IconProps {
@@ -286,10 +292,10 @@ export const ChevronLeft = ({ size = 24, className = "" }: IconProps) => {
 
 // ////////////////////////////// Constants ////////////////////////////// //
 const TOOLS = [
-  { name: "brush", icon: Paintbrush, shortcut: "B" },
-  { name: "eraser", icon: Eraser, shortcut: "E" },
-  { name: "rectangle", icon: Square, shortcut: "R" },
-  { name: "circle", icon: Circle, shortcut: "C" },
+  { item: "brush", icon: Paintbrush, shortcut: "B" },
+  { item: "eraser", icon: Eraser, shortcut: "E" },
+  { item: "rectangle", icon: Square, shortcut: "R" },
+  { item: "circle", icon: Circle, shortcut: "C" },
 ];
 const DRAWER_ITEMS = [
   { item: "color", icon: Palette, title: "Color Palette" },
@@ -337,8 +343,25 @@ const COLOR_PALLETE = [
   "#FF8800",
 ];
 const COLOR_MODES = ["palette", "custom"];
+const LAYERS = [
+  {
+    id: 1,
+    name: "Background",
+    visible: true,
+    canvas: null,
+    context: null,
+  },
+  {
+    id: 2,
+    name: "Layer 1",
+    visible: true,
+    canvas: null,
+    context: null,
+  },
+];
 
 // ////////////////////////////// Types ////////////////////////////// //
+type ToolItems = (typeof TOOLS)[number]["item"];
 type DrawerItem = (typeof DRAWER_ITEMS)[number]["item"];
 type ColorModeItem = (typeof COLOR_MODES)[number];
 
@@ -684,10 +707,465 @@ const ToolSettings = ({}: ToolSettingsProps) => {
   return <div>Tool Settings</div>;
 };
 
+// ////////////////////////////// Canvas ////////////////////////////// //
+type CanvasProps = {
+  layers: Layer[];
+  activeLayerId: number;
+  backgroundColor: string;
+  tool: ToolItems;
+  color: string;
+  brushSize: number;
+  eraserSize: number;
+  opacity: number;
+  onLayerChange: (layers: Layer[]) => void;
+  cursorStyle: string;
+};
+const Canvas = ({
+  layers,
+  activeLayerId,
+  backgroundColor,
+  tool,
+  color,
+  brushSize,
+  eraserSize,
+  opacity,
+  onLayerChange,
+  cursorStyle,
+}: CanvasProps) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [startPos, setStartPos] = useState({ x: 0, y: 0 });
+  const [lastPos, setLastPos] = useState({ x: 0, y: 0 });
+  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
+  const [tempCanvas, setTempCanvas] = useState<HTMLCanvasElement | null>(null);
+  const [tempContext, setTempContext] =
+    useState<CanvasRenderingContext2D | null>(null);
+  const [tempCanvasVersion, setTempCanvasVersion] = useState(0); // To track changes to temp canvas
+
+  // Initialize container size
+  useEffect(() => {
+    if (containerRef.current) {
+      const updateSize = () => {
+        const container = containerRef.current;
+        if (container) {
+          setContainerSize({
+            width: container.clientWidth,
+            height: container.clientHeight,
+          });
+        }
+      };
+
+      updateSize();
+      window.addEventListener("resize", updateSize);
+      return () => window.removeEventListener("resize", updateSize);
+    }
+  }, []);
+
+  // Initialize canvas for each layer
+  useEffect(() => {
+    if (containerSize.width === 0 || containerSize.height === 0) return;
+
+    // Check if we need to initialize any canvases
+    const needsInitialization = layers.some((layer) => !layer.canvas);
+    if (needsInitialization) {
+      const updatedLayers = layers.map((layer) => {
+        if (!layer.canvas) {
+          const canvas = document.createElement("canvas");
+          canvas.width = containerSize.width;
+          canvas.height = containerSize.height;
+
+          const context = canvas.getContext("2d");
+          if (context) {
+            context.lineCap = "round";
+            context.lineJoin = "round";
+
+            // If this is the background layer, fill it with the background color
+            if (layer.id === 1) {
+              console.log(
+                "Initializing background layer with color:",
+                backgroundColor,
+              );
+              context.fillStyle = backgroundColor;
+              context.fillRect(0, 0, containerSize.width, containerSize.height);
+            }
+          }
+
+          return {
+            ...layer,
+            canvas,
+            context,
+          };
+        }
+        return layer;
+      });
+      onLayerChange(updatedLayers);
+    }
+
+    // Create a temporary canvas for shape drawing if it doesn't exist
+    if (!tempCanvas) {
+      const canvas = document.createElement("canvas");
+      canvas.width = containerSize.width;
+      canvas.height = containerSize.height;
+
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+      }
+
+      setTempCanvas(canvas);
+      setTempContext(ctx);
+    }
+  }, [containerSize, layers, onLayerChange, backgroundColor, tempCanvas]);
+
+  // Track previous background color to avoid unnecessary updates
+  const prevBackgroundColorRef = useRef(backgroundColor);
+
+  // Update background color when it changes
+  useEffect(() => {
+    // Only update if the background color actually changed
+    if (prevBackgroundColorRef.current === backgroundColor) return;
+
+    console.log(
+      "Background color changed from",
+      prevBackgroundColorRef.current,
+      "to",
+      backgroundColor,
+    );
+    prevBackgroundColorRef.current = backgroundColor;
+
+    const backgroundLayer = layers.find((layer) => layer.id === 1);
+    if (backgroundLayer?.context && containerSize.width > 0) {
+      // Clear the background layer first
+      backgroundLayer.context.clearRect(
+        0,
+        0,
+        containerSize.width,
+        containerSize.height,
+      );
+      // Fill with the new background color
+      backgroundLayer.context.fillStyle = backgroundColor;
+      backgroundLayer.context.fillRect(
+        0,
+        0,
+        containerSize.width,
+        containerSize.height,
+      );
+
+      // Force a redraw of the visible canvas
+      if (backgroundLayer.canvas) {
+        const canvasCopy = document.createElement("canvas");
+        canvasCopy.width = containerSize.width;
+        canvasCopy.height = containerSize.height;
+        const ctx = canvasCopy.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(backgroundLayer.canvas, 0, 0);
+          backgroundLayer.canvas = canvasCopy;
+        }
+      }
+    }
+  }, [backgroundColor, containerSize, layers]);
+
+  // Drawing functions
+  const startDrawing = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (!containerRef.current) return;
+
+      const activeLayer = layers.find((l) => l.id === activeLayerId);
+      if (!activeLayer?.context) return;
+
+      const rect = containerRef.current.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      setIsDrawing(true);
+      setStartPos({ x, y });
+      setLastPos({ x, y });
+
+      const ctx = activeLayer.context;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+
+      if (tool === "brush") {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = brushSize;
+        ctx.globalAlpha = opacity;
+        ctx.lineTo(x, y);
+        ctx.stroke();
+      } else if (tool === "eraser") {
+        ctx.globalCompositeOperation = "destination-out";
+        ctx.lineWidth = eraserSize;
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.globalCompositeOperation = "source-over";
+      }
+    },
+    [layers, activeLayerId, tool, color, brushSize, eraserSize, opacity],
+  );
+
+  const draw = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (!isDrawing || !containerRef.current) return;
+
+      const activeLayer = layers.find((l) => l.id === activeLayerId);
+      if (!activeLayer?.context) return;
+
+      const rect = containerRef.current.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      const ctx = activeLayer.context;
+
+      if (tool === "brush") {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = brushSize;
+        ctx.globalAlpha = opacity;
+        ctx.beginPath();
+        ctx.moveTo(lastPos.x, lastPos.y);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+      } else if (tool === "eraser") {
+        ctx.globalCompositeOperation = "destination-out";
+        ctx.lineWidth = eraserSize;
+        ctx.beginPath();
+        ctx.moveTo(lastPos.x, lastPos.y);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.globalCompositeOperation = "source-over";
+      } else if (
+        (tool === "rectangle" || tool === "circle") &&
+        tempContext &&
+        tempCanvas
+      ) {
+        // For shape drawing, we need to clear and redraw on each mouse move
+        tempContext.clearRect(0, 0, containerSize.width, containerSize.height);
+
+        // Copy the current layer to the temp canvas
+        if (activeLayer.canvas) {
+          tempContext.drawImage(activeLayer.canvas, 0, 0);
+        }
+
+        tempContext.strokeStyle = color;
+        tempContext.lineWidth = brushSize;
+        tempContext.globalAlpha = opacity;
+
+        if (tool === "rectangle") {
+          const width = x - startPos.x;
+          const height = y - startPos.y;
+          tempContext.strokeRect(startPos.x, startPos.y, width, height);
+        } else if (tool === "circle") {
+          const radius = Math.sqrt(
+            Math.pow(x - startPos.x, 2) + Math.pow(y - startPos.y, 2),
+          );
+          tempContext.beginPath();
+          tempContext.arc(startPos.x, startPos.y, radius, 0, 2 * Math.PI);
+          tempContext.stroke();
+        }
+
+        tempContext.globalAlpha = 1;
+
+        // Increment the version to trigger a re-render
+        setTempCanvasVersion((prev) => prev + 1);
+      }
+      // Update last position
+      setLastPos({ x, y });
+    },
+    [
+      isDrawing,
+      layers,
+      activeLayerId,
+      tool,
+      color,
+      brushSize,
+      eraserSize,
+      opacity,
+      startPos,
+      lastPos,
+      containerSize,
+      tempContext,
+      tempCanvas,
+    ],
+  );
+
+  const stopDrawing = useCallback(() => {
+    if (!isDrawing) return;
+    setIsDrawing(false);
+
+    // If we were drawing a shape, apply it to the active layer
+    if (
+      (tool === "rectangle" || tool === "circle") &&
+      tempCanvas &&
+      tempContext
+    ) {
+      const activeLayer = layers.find((l) => l.id === activeLayerId);
+      if (activeLayer?.context && activeLayer.canvas) {
+        // Apply the shape from temp canvas to the active layer
+        activeLayer.context.drawImage(tempCanvas, 0, 0);
+        // Clear the temp canvas
+        tempContext.clearRect(0, 0, containerSize.width, containerSize.height);
+      }
+    }
+  }, [
+    isDrawing,
+    tool,
+    tempCanvas,
+    tempContext,
+    layers,
+    activeLayerId,
+    containerSize,
+  ]);
+
+  // Reference to the visible temp canvas element
+  const visibleTempCanvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  // Update the visible temp canvas whenever the temp canvas changes
+  useEffect(() => {
+    if (
+      visibleTempCanvasRef.current &&
+      tempCanvas &&
+      (tool === "rectangle" || tool === "circle")
+    ) {
+      const ctx = visibleTempCanvasRef.current.getContext("2d");
+      if (ctx) {
+        ctx.clearRect(0, 0, containerSize.width, containerSize.height);
+        ctx.drawImage(tempCanvas, 0, 0);
+      }
+    }
+  }, [tempCanvas, tool, containerSize, tempCanvasVersion]);
+
+  // Render temp canvas for shape drawing
+  const renderTempCanvas = () => {
+    // Always show the temp canvas when rectangle or circle tool is selected
+    if (!tempCanvas || (tool !== "rectangle" && tool !== "circle")) return null;
+
+    return (
+      <div
+        className="absolute top-0 left-0 h-full w-full"
+        style={{
+          zIndex: 1000, // Above all layers
+          pointerEvents: "none", // Don't capture mouse events
+        }}
+      >
+        <canvas
+          ref={visibleTempCanvasRef}
+          width={containerSize.width}
+          height={containerSize.height}
+          className="h-full w-full"
+        />
+      </div>
+    );
+  };
+
+  // Touch event handlers
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent<HTMLDivElement>) => {
+      if (!containerRef.current) return;
+      // Prevent scrolling while drawing
+      e.preventDefault();
+
+      const touch = e.touches[0]!;
+      const mouseEvent = {
+        clientX: touch.clientX,
+        clientY: touch.clientY,
+      } as React.MouseEvent<HTMLDivElement>;
+
+      startDrawing(mouseEvent);
+    },
+    [startDrawing],
+  );
+
+  const handleTouchMove = useCallback(
+    (e: React.TouchEvent<HTMLDivElement>) => {
+      if (!containerRef.current) return;
+      // Prevent scrolling while drawing
+      e.preventDefault();
+
+      const touch = e.touches[0]!;
+      const mouseEvent = {
+        clientX: touch.clientX,
+        clientY: touch.clientY,
+      } as React.MouseEvent<HTMLDivElement>;
+
+      draw(mouseEvent);
+    },
+    [draw],
+  );
+
+  const handleTouchEnd = useCallback(() => {
+    stopDrawing();
+  }, [stopDrawing]);
+
+  return (
+    <div
+      ref={containerRef}
+      className={`relative h-full w-full ${cursorStyle}`}
+      onMouseDown={startDrawing}
+      onMouseMove={draw}
+      onMouseUp={stopDrawing}
+      onMouseLeave={stopDrawing}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      {layers.map((layer) => {
+        if (!layer.canvas || !layer.visible) return null;
+
+        return (
+          <div
+            key={layer.id}
+            className="absolute top-0 left-0 h-full w-full"
+            style={{
+              zIndex: layer.id,
+            }}
+          >
+            <canvas
+              key={
+                layer.id === 1 ? `bg-${backgroundColor}` : `layer-${layer.id}`
+              }
+              width={containerSize.width}
+              height={containerSize.height}
+              className="h-full w-full"
+              style={{
+                display: layer.visible ? "block" : "none",
+              }}
+              ref={(el) => {
+                if (el && layer.canvas) {
+                  // Copy the content from our offscreen canvas to this visible canvas
+                  const ctx = el.getContext("2d");
+                  if (ctx && layer.canvas) {
+                    // For background layer, always use the current background color
+                    if (layer.id === 1) {
+                      ctx.clearRect(0, 0, el.width, el.height);
+                      ctx.fillStyle = backgroundColor;
+                      ctx.fillRect(0, 0, el.width, el.height);
+                    } else {
+                      ctx.clearRect(0, 0, el.width, el.height);
+                      ctx.drawImage(layer.canvas, 0, 0);
+                    }
+                  }
+                }
+              }}
+            />
+          </div>
+        );
+      })}
+      {renderTempCanvas()}
+    </div>
+  );
+};
+
 // ////////////////////////////// Main Component ////////////////////////////// //
+// Define the Layer interface
+type Layer = {
+  id: number;
+  name: string;
+  visible: boolean;
+  canvas: HTMLCanvasElement | null;
+  context: CanvasRenderingContext2D | null;
+};
 const CanvasKit = () => {
   // Canvas state
-  const [tool, setTool] = useState<(typeof TOOLS)[number]["name"]>("brush");
+  const [tool, setTool] = useState<ToolItems>("brush");
   const [color, setColor] = useState("#000000");
   const [brushSize, setBrushSize] = useState(5);
   const [eraserSize, setEraserSize] = useState(10);
@@ -698,13 +1176,29 @@ const CanvasKit = () => {
   const [activeDrawer, setActiveDrawer] = useState<DrawerItem | null>(null);
   const [previousDrawer, setPreviousDrawer] = useState<DrawerItem | null>(null);
 
+  // Layers state
+  const [layers, setLayers] = useState<Layer[]>(LAYERS);
+  const [activeLayer, setActiveLayer] = useState(2);
+
   // Tool selection
-  const selectTool = useCallback(
-    (selectedTool: (typeof TOOLS)[number]["name"]) => {
-      setTool(selectedTool);
-    },
-    [],
-  );
+  const selectTool = useCallback((selectedTool: ToolItems) => {
+    setTool(selectedTool);
+  }, []);
+  // Get cursor style based on current tool
+  const getCursorStyle = () => {
+    switch (tool) {
+      case "brush":
+        return "cursor-crosshair";
+      case "eraser":
+        return "cursor-cell";
+      case "rectangle":
+        return "cursor-crosshair";
+      case "circle":
+        return "cursor-crosshair";
+      default:
+        return "cursor-default";
+    }
+  };
 
   // Create drawer content with access to state
   const DRAWER = DRAWER_ITEMS.map((item) => {
@@ -813,14 +1307,14 @@ const CanvasKit = () => {
         <div className="flex justify-center gap-2 overflow-x-auto border-r border-gray-200 bg-white p-2 md:flex-col md:justify-start md:overflow-y-auto">
           {TOOLS.map((item) => (
             <button
-              key={item.name}
-              onClick={() => selectTool(item.name)}
+              key={item.item}
+              onClick={() => selectTool(item.item)}
               className={`rounded-lg p-3 ${
-                tool === item.name
+                tool === item.item
                   ? "bg-blue-100 text-blue-600"
                   : "text-gray-700 hover:bg-gray-100"
               } transition-colors`}
-              title={`${item.name.charAt(0).toUpperCase() + item.name.slice(1)} Tool (${item.shortcut})`}
+              title={`${item.item.charAt(0).toUpperCase() + item.item.slice(1)} Tool (${item.shortcut})`}
             >
               <item.icon size={20} />
             </button>
@@ -850,6 +1344,22 @@ const CanvasKit = () => {
           >
             <Trash2 size={20} />
           </button>
+        </div>
+
+        {/* Canvas Area */}
+        <div className="relative flex-1 overflow-hidden">
+          <Canvas
+            layers={layers}
+            activeLayerId={activeLayer}
+            backgroundColor={backgroundColor}
+            tool={tool}
+            color={color}
+            brushSize={brushSize}
+            eraserSize={eraserSize}
+            opacity={opacity}
+            onLayerChange={setLayers}
+            cursorStyle={getCursorStyle()}
+          />
         </div>
 
         {/* Drawers */}
