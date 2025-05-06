@@ -1,29 +1,116 @@
-# Create T3 App
+# Canvas Kit
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+A lightweight and responsive drawing application built with Next.js, React, and TypeScript. Canvas Kit provides an intuitive interface for digital sketching, drawing, and concept art.
 
-## What's next? How do I make an app with this?
+## Features
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+- **Multiple Drawing Tools**: Brush, eraser, rectangle, and circle tools
+- **Layer Management**: Create, toggle visibility, and manage multiple layers
+- **Color Selection**: Choose from a predefined palette or use custom colors
+- **Tool Settings**: Adjust brush size, eraser size, and opacity
+- **Background Customization**: Change the canvas background color
+- **Export Functionality**: Save your artwork as an image
+- **Responsive Design**: Works on both desktop and mobile devices
+- **Keyboard Shortcuts**: Quickly switch between tools
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+## Tech Stack
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+Canvas Kit is built with the following technologies:
 
-## Learn More
+- [Next.js 15](https://nextjs.org) - React framework with App Router
+- [React 19](https://react.dev) - UI library
+- [TypeScript](https://www.typescriptlang.org) - Type-safe JavaScript
+- [Tailwind CSS](https://tailwindcss.com) - Utility-first CSS framework
+- [Framer Motion](https://www.framer.com/motion) - Animation library
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+## Getting Started
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+### Prerequisites
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+- [Node.js](https://nodejs.org/) (v18 or newer)
+- [Bun](https://bun.sh) (recommended) or [npm](https://www.npmjs.com/)
 
-## How do I deploy this?
+### Installation
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+1. Clone the repository:
+
+```bash
+git clone https://github.com/your-username/canvas-kit.git
+cd canvas-kit
+```
+
+2. Install dependencies:
+
+```bash
+# Using Bun (recommended)
+bun install
+
+# OR using npm
+npm install
+```
+
+4. Start the development server:
+
+```bash
+# Using Bun (recommended)
+bun dev
+
+# OR using npm
+npm run dev
+```
+
+5. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
+
+### Project Structure
+
+```
+canvas-kit/
+├── public/             # Static assets
+├── src/
+│   ├── app/            # Next.js App Router
+│   │   ├── layout.tsx  # Root layout
+│   │   └── page.tsx    # Home page with Canvas application
+│   ├── components/     # React components
+│   ├── styles/         # Global styles
+│   └── env.js          # Environment variables validation
+├── .env.example        # Example environment variables
+├── next.config.js      # Next.js configuration
+├── package.json        # Project dependencies and scripts
+├── tailwind.config.js  # Tailwind CSS configuration
+└── tsconfig.json       # TypeScript configuration
+```
+
+## Canvas Features
+
+### Drawing Tools
+
+- **Brush (B)**: Freehand drawing with adjustable size and opacity
+- **Eraser (E)**: Remove parts of your drawing with adjustable size
+- **Rectangle (R)**: Draw rectangles with adjustable stroke width and opacity
+- **Circle (C)**: Draw circles with adjustable stroke width and opacity
+
+### Layer System
+
+- Create multiple layers for complex artwork
+- Toggle layer visibility
+- Select active layer for editing
+- Background layer with customizable color
+
+### Color Selection
+
+- Predefined color palette with a range of colors
+- Custom color picker for precise color selection
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## Acknowledgements
+
+- [Create T3 App](https://create.t3.gg/) - The starting template for this project
