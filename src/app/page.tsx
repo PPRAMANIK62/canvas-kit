@@ -296,18 +296,18 @@ const TOOLS = [
   { item: "eraser", icon: Eraser, shortcut: "E" },
   { item: "rectangle", icon: Square, shortcut: "R" },
   { item: "circle", icon: Circle, shortcut: "C" },
-];
+] as const;
 const DRAWER_ITEMS = [
-  { item: "color", icon: Palette, title: "Color Palette" },
-  { item: "settings", icon: Settings, title: "Tool Settings" },
-  { item: "layers", icon: Layers, title: "Layers" },
+  { item: "color", icon: Palette, title: "Color Palette", iconProps: {} },
+  { item: "settings", icon: Settings, title: "Tool Settings", iconProps: {} },
+  { item: "layers", icon: Layers, title: "Layers", iconProps: {} },
   {
     item: "background",
     icon: Palette,
     title: "Background Color",
     iconProps: { className: "fill-yellow-100" },
   },
-];
+] as const;
 const COLOR_PALLETE = [
   // Row 1 - Grayscale
   "#000000",
@@ -342,7 +342,7 @@ const COLOR_PALLETE = [
   "#FF00FF",
   "#FF8800",
 ];
-const COLOR_MODES = ["palette", "custom"];
+const COLOR_MODES = ["palette", "custom"] as const;
 const LAYERS = [
   {
     id: 1,
@@ -695,7 +695,7 @@ const LayersPanel = ({}: LayersPanelProps) => {
 
 // ////////////////////////////// Tool Settings ////////////////////////////// //
 type ToolSettingsProps = {
-  tool: string;
+  tool: ToolItems;
   brushSize: number;
   setBrushSize: (size: number) => void;
   eraserSize: number;
@@ -703,8 +703,73 @@ type ToolSettingsProps = {
   opacity: number;
   setOpacity: (opacity: number) => void;
 };
-const ToolSettings = ({}: ToolSettingsProps) => {
-  return <div>Tool Settings</div>;
+const ToolSettings = ({
+  tool,
+  brushSize,
+  setBrushSize,
+  eraserSize,
+  setEraserSize,
+  opacity,
+  setOpacity,
+}: ToolSettingsProps) => {
+  const size = tool === "eraser" ? eraserSize : brushSize;
+  const setSize = tool === "eraser" ? setEraserSize : setBrushSize;
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div>
+        <div className="mb-2 flex items-center justify-between">
+          <span className="text-sm font-medium">Size</span>
+          <span className="text-sm text-gray-400">{size}px</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <input
+            type="range"
+            min="1"
+            max="50"
+            value={size}
+            onChange={(e) => setSize(Number(e.target.value))}
+            className="flex-1 accent-blue-500"
+          />
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gray-700">
+            <div
+              className="rounded-full bg-white"
+              style={{
+                width: `${Math.min(size, 40)}px`,
+                height: `${Math.min(size, 40)}px`,
+              }}
+            />
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div className="mb-2 flex items-center justify-between">
+          <span className="text-sm font-medium">Opacity</span>
+          <span className="text-sm text-gray-400">
+            {Math.round(opacity * 100)}%
+          </span>
+        </div>
+        <div className="flex items-center gap-3">
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value={opacity}
+            onChange={(e) => setOpacity(Number(e.target.value))}
+            className="flex-1 accent-blue-500"
+          />
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gray-700">
+            <div
+              className="h-8 w-8 rounded-full bg-white"
+              style={{ opacity }}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 // ////////////////////////////// Canvas ////////////////////////////// //
