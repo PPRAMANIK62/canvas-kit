@@ -14,7 +14,7 @@ interface IconProps {
   size?: number;
   className?: string;
 }
-export const Circle = ({ size = 24, className = "" }: IconProps) => {
+const Circle = ({ size = 24, className = "" }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -32,7 +32,7 @@ export const Circle = ({ size = 24, className = "" }: IconProps) => {
     </svg>
   );
 };
-export const Download = ({ size = 24, className = "" }: IconProps) => {
+const Download = ({ size = 24, className = "" }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -52,7 +52,7 @@ export const Download = ({ size = 24, className = "" }: IconProps) => {
     </svg>
   );
 };
-export const Eraser = ({ size = 24, className = "" }: IconProps) => {
+const Eraser = ({ size = 24, className = "" }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -72,7 +72,7 @@ export const Eraser = ({ size = 24, className = "" }: IconProps) => {
     </svg>
   );
 };
-export const Layers = ({ size = 24, className = "" }: IconProps) => {
+const Layers = ({ size = 24, className = "" }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -92,7 +92,7 @@ export const Layers = ({ size = 24, className = "" }: IconProps) => {
     </svg>
   );
 };
-export const Paintbrush = ({ size = 24, className = "" }: IconProps) => {
+const Paintbrush = ({ size = 24, className = "" }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -112,7 +112,7 @@ export const Paintbrush = ({ size = 24, className = "" }: IconProps) => {
     </svg>
   );
 };
-export const Palette = ({ size = 24, className = "" }: IconProps) => {
+const Palette = ({ size = 24, className = "" }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -134,7 +134,7 @@ export const Palette = ({ size = 24, className = "" }: IconProps) => {
     </svg>
   );
 };
-export const Settings = ({ size = 24, className = "" }: IconProps) => {
+const Settings = ({ size = 24, className = "" }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -153,7 +153,7 @@ export const Settings = ({ size = 24, className = "" }: IconProps) => {
     </svg>
   );
 };
-export const Square = ({ size = 24, className = "" }: IconProps) => {
+const Square = ({ size = 24, className = "" }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -171,7 +171,7 @@ export const Square = ({ size = 24, className = "" }: IconProps) => {
     </svg>
   );
 };
-export const Trash2 = ({ size = 24, className = "" }: IconProps) => {
+const Trash2 = ({ size = 24, className = "" }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -193,7 +193,7 @@ export const Trash2 = ({ size = 24, className = "" }: IconProps) => {
     </svg>
   );
 };
-export const Eye = ({ size = 24, className = "" }: IconProps) => {
+const Eye = ({ size = 24, className = "" }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -212,7 +212,7 @@ export const Eye = ({ size = 24, className = "" }: IconProps) => {
     </svg>
   );
 };
-export const EyeOff = ({ size = 24, className = "" }: IconProps) => {
+const EyeOff = ({ size = 24, className = "" }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -233,7 +233,7 @@ export const EyeOff = ({ size = 24, className = "" }: IconProps) => {
     </svg>
   );
 };
-export const Plus = ({ size = 24, className = "" }: IconProps) => {
+const Plus = ({ size = 24, className = "" }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -252,7 +252,7 @@ export const Plus = ({ size = 24, className = "" }: IconProps) => {
     </svg>
   );
 };
-export const X = ({ size = 24, className = "" }: IconProps) => {
+const X = ({ size = 24, className = "" }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -271,7 +271,7 @@ export const X = ({ size = 24, className = "" }: IconProps) => {
     </svg>
   );
 };
-export const ChevronLeft = ({ size = 24, className = "" }: IconProps) => {
+const ChevronLeft = ({ size = 24, className = "" }: IconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
