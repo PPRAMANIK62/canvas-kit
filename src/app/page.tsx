@@ -3,6 +3,345 @@
 import { motion } from "framer-motion";
 import { useCallback, useState, type ReactNode } from "react";
 
+// ////////////////////////////// Icons ////////////////////////////// //
+interface IconProps {
+  size?: number;
+  className?: string;
+}
+export const Circle = ({ size = 24, className = "" }: IconProps) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <circle cx="12" cy="12" r="10" />
+    </svg>
+  );
+};
+export const Download = ({ size = 24, className = "" }: IconProps) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="7 10 12 15 17 10" />
+      <line x1="12" y1="15" x2="12" y2="3" />
+    </svg>
+  );
+};
+export const Eraser = ({ size = 24, className = "" }: IconProps) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21" />
+      <path d="M22 21H7" />
+      <path d="m5 11 9 9" />
+    </svg>
+  );
+};
+export const Layers = ({ size = 24, className = "" }: IconProps) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <polygon points="12 2 2 7 12 12 22 7 12 2" />
+      <polyline points="2 17 12 22 22 17" />
+      <polyline points="2 12 12 17 22 12" />
+    </svg>
+  );
+};
+export const Paintbrush = ({ size = 24, className = "" }: IconProps) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M18.37 2.63 14 7l-1.59-1.59a2 2 0 0 0-2.82 0L8 7l9 9 1.59-1.59a2 2 0 0 0 0-2.82L17 10l4.37-4.37a2.12 2.12 0 1 0-3-3Z" />
+      <path d="M9 8c-2 3-4 3.5-7 4l8 10c2-1 6-5 6-7" />
+      <path d="M14.5 17.5 4.5 15" />
+    </svg>
+  );
+};
+export const Palette = ({ size = 24, className = "" }: IconProps) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <circle cx="13.5" cy="6.5" r=".5" />
+      <circle cx="17.5" cy="10.5" r=".5" />
+      <circle cx="8.5" cy="7.5" r=".5" />
+      <circle cx="6.5" cy="12.5" r=".5" />
+      <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" />
+    </svg>
+  );
+};
+export const Settings = ({ size = 24, className = "" }: IconProps) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+};
+export const Square = ({ size = 24, className = "" }: IconProps) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+    </svg>
+  );
+};
+export const Trash2 = ({ size = 24, className = "" }: IconProps) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M3 6h18" />
+      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+      <line x1="10" y1="11" x2="10" y2="17" />
+      <line x1="14" y1="11" x2="14" y2="17" />
+    </svg>
+  );
+};
+export const Eye = ({ size = 24, className = "" }: IconProps) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+};
+export const EyeOff = ({ size = 24, className = "" }: IconProps) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+      <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
+      <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
+      <line x1="2" x2="22" y1="2" y2="22" />
+    </svg>
+  );
+};
+export const Plus = ({ size = 24, className = "" }: IconProps) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <line x1="12" y1="5" x2="12" y2="19" />
+      <line x1="5" y1="12" x2="19" y2="12" />
+    </svg>
+  );
+};
+export const X = ({ size = 24, className = "" }: IconProps) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  );
+};
+export const ChevronLeft = ({ size = 24, className = "" }: IconProps) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="m15 18-6-6 6-6" />
+    </svg>
+  );
+};
+
+// ////////////////////////////// Constants ////////////////////////////// //
+const TOOLS = [
+  { name: "brush", icon: Paintbrush, shortcut: "B" },
+  { name: "eraser", icon: Eraser, shortcut: "E" },
+  { name: "rectangle", icon: Square, shortcut: "R" },
+  { name: "circle", icon: Circle, shortcut: "C" },
+];
+const DRAWER_ITEMS = [
+  { item: "color", icon: Palette, title: "Color Palette" },
+  { item: "settings", icon: Settings, title: "Tool Settings" },
+  { item: "layers", icon: Layers, title: "Layers" },
+  {
+    item: "background",
+    icon: Palette,
+    title: "Background Color",
+    iconProps: { className: "fill-yellow-100" },
+  },
+];
+const COLOR_PALLETE = [
+  // Row 1 - Grayscale
+  "#000000",
+  "#444444",
+  "#666666",
+  "#888888",
+  "#AAAAAA",
+  "#CCCCCC",
+  "#FFFFFF",
+  // Row 2 - Light colors
+  "#FFAAAA",
+  "#FFFFAA",
+  "#AAFFAA",
+  "#AAFFFF",
+  "#AAAAFF",
+  "#FFAAFF",
+  "#FFCCAA",
+  // Row 3 - Medium colors
+  "#FF5555",
+  "#FFFF55",
+  "#55FF55",
+  "#55FFFF",
+  "#5555FF",
+  "#FF55FF",
+  "#FFAA55",
+  // Row 4 - Dark colors
+  "#FF0000",
+  "#FFFF00",
+  "#00FF00",
+  "#00FFFF",
+  "#0000FF",
+  "#FF00FF",
+  "#FF8800",
+];
+const COLOR_MODES = ["palette", "custom"];
+
+// ////////////////////////////// Types ////////////////////////////// //
+type DrawerItem = (typeof DRAWER_ITEMS)[number]["item"];
+type ColorModeItem = (typeof COLOR_MODES)[number];
+
 // ////////////////////////////// Components ////////////////////////////// //
 const Separator = () => {
   return <div className="my-2 hidden h-px w-full bg-gray-200 md:block" />;
@@ -73,10 +412,238 @@ const Drawer = ({
 type ColorPaletteProps = {
   color: string;
   setColor: (color: string) => void;
-  colorPalette: string[];
 };
-const ColorPalette = ({}: ColorPaletteProps) => {
-  return <div>Color Palette</div>;
+const ColorPalette = ({ color, setColor }: ColorPaletteProps) => {
+  const [mode, setMode] = useState<ColorModeItem>("palette");
+  const [hue, setHue] = useState(0); // Default to red
+  const [customColor, setCustomColor] = useState(color);
+
+  // Convert hex to HSV
+  const hexToHSV = (hex: string) => {
+    // Remove the hash if it exists
+    hex = hex.replace(/^#/, "");
+
+    // Parse the hex values
+    const r = parseInt(hex.substring(0, 2), 16) / 255;
+    const g = parseInt(hex.substring(2, 4), 16) / 255;
+    const b = parseInt(hex.substring(4, 6), 16) / 255;
+
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const delta = max - min;
+
+    // Calculate HSV
+    let h = 0;
+    const s = max === 0 ? 0 : delta / max;
+    const v = max;
+
+    if (delta === 0) {
+      h = 0;
+    } else if (max === r) {
+      h = ((g - b) / delta) % 6;
+    } else if (max === g) {
+      h = (b - r) / delta + 2;
+    } else {
+      h = (r - g) / delta + 4;
+    }
+
+    h = Math.round(h * 60);
+    if (h < 0) h += 360;
+
+    return { h, s, v };
+  };
+  // Convert HSV to hex
+  const hsvToHex = (h: number, s: number, v: number) => {
+    const f = (n: number, k = (n + h / 60) % 6) =>
+      v - v * s * Math.max(Math.min(k, 4 - k, 1), 0);
+    const r = Math.round(f(5) * 255);
+    const g = Math.round(f(3) * 255);
+    const b = Math.round(f(1) * 255);
+
+    return `#${r.toString(16).padStart(2, "0")}${g
+      .toString(16)
+      .padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+  };
+  // Extract hex without # for the input field
+  const hexValue = color.startsWith("#") ? color.substring(1) : color;
+
+  // Handle color selection from palette
+  const selectColor = (selectedColor: string) => {
+    setColor(selectedColor);
+    setCustomColor(selectedColor);
+
+    // Update hue state based on the selected color
+    const { h } = hexToHSV(selectedColor);
+    setHue(h);
+  };
+
+  // Get color picker position from HSV
+  const getCirclePosition = (color: string) => {
+    const { s, v } = hexToHSV(color);
+    return {
+      x: `${s * 100}%`,
+      y: `${100 - v * 100}%`,
+    };
+  };
+  const circlePos = getCirclePosition(customColor);
+
+  // Handle color picker click/drag
+  const handleColorPickerChange = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    const y = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
+
+    const s = x;
+    const v = 1 - y;
+
+    const newColor = hsvToHex(hue, s, v);
+    setCustomColor(newColor);
+    setColor(newColor);
+  };
+
+  // Handle hex input change
+  const handleHexChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    const hexValue = value.startsWith("#") ? value : `#${value}`;
+
+    // Only update if it's a valid hex color or empty
+    if (/^#([0-9A-F]{3}){1,2}$/i.test(hexValue) || value.length === 0) {
+      setCustomColor(hexValue);
+      setColor(hexValue);
+
+      // Update hue state based on the new color
+      if (hexValue.length >= 4) {
+        // At least #RGB format
+        const { h } = hexToHSV(hexValue);
+        setHue(h);
+      }
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-4">
+      {/* Mode Selector */}
+      <div className="flex rounded-full bg-gray-700 p-1">
+        {COLOR_MODES.map((modeItem) => (
+          <button
+            key={modeItem}
+            onClick={() => setMode(modeItem)}
+            className={`flex-1 rounded-full px-4 py-1.5 text-sm transition-colors ${
+              mode === modeItem ? "bg-blue-500 text-white" : "text-gray-300"
+            }`}
+          >
+            {modeItem.charAt(0).toUpperCase() + modeItem.slice(1)}
+          </button>
+        ))}
+      </div>
+
+      {/* Palette Mode */}
+      {mode === "palette" && (
+        <div className="mt-2 grid grid-cols-7 gap-2">
+          {COLOR_PALLETE.map((paletteColor, index) => (
+            <button
+              key={index}
+              className={`aspect-square w-full rounded-full ${
+                color === paletteColor
+                  ? "ring-2 ring-blue-400 ring-offset-1 ring-offset-gray-800"
+                  : ""
+              }`}
+              style={{ backgroundColor: paletteColor }}
+              onClick={() => selectColor(paletteColor)}
+              aria-label={`Select color ${paletteColor}`}
+            />
+          ))}
+        </div>
+      )}
+      {/* Custom Mode */}
+      {mode === "custom" && (
+        <div className="mt-2">
+          {/* Color Picker Area */}
+          <div className="mb-3 aspect-video w-full overflow-hidden rounded">
+            <div
+              className="relative h-full w-full cursor-crosshair"
+              style={{
+                background: `
+                  linear-gradient(to right, #fff, hsl(${hue}, 100%, 50%)),
+                  linear-gradient(to bottom, rgba(0,0,0,0), #000)
+                `,
+                backgroundBlendMode: "multiply",
+              }}
+              onClick={handleColorPickerChange}
+              onMouseMove={(e) => {
+                if (e.buttons === 1) {
+                  handleColorPickerChange(e);
+                }
+              }}
+            >
+              <div
+                className="pointer-events-none absolute h-6 w-6 -translate-x-1/2 -translate-y-1/2 transform rounded-full border-2 border-white"
+                style={{
+                  top: circlePos.y,
+                  left: circlePos.x,
+                  boxShadow: "0 0 0 1px rgba(0,0,0,0.3)",
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Hue Slider */}
+          <div className="mb-4 flex items-center gap-3">
+            <div
+              className="relative h-4 w-full rounded-full"
+              style={{
+                background:
+                  "linear-gradient(to right, #FF0000, #FFFF00, #00FF00, #00FFFF, #0000FF, #FF00FF, #FF0000)",
+              }}
+            >
+              <input
+                type="range"
+                min="0"
+                max="360"
+                value={hue}
+                onChange={(e) => {
+                  const newHue = Number(e.target.value);
+                  setHue(newHue);
+                  // Update color based on new hue but keep saturation and value
+                  const { s, v } = hexToHSV(customColor);
+                  const newColor = hsvToHex(newHue, s, v);
+                  setCustomColor(newColor);
+                  setColor(newColor);
+                }}
+                className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+              />
+              <div
+                className="absolute h-4 w-4 -translate-x-1/2 -translate-y-1/2 transform rounded-full border border-gray-300 bg-white"
+                style={{
+                  top: "50%",
+                  left: `${(hue / 360) * 100}%`,
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Hex Input */}
+          <div>
+            <div className="mb-1 flex items-center justify-between">
+              <span className="text-sm text-gray-300">Hex</span>
+            </div>
+            <div className="relative">
+              <span className="absolute inset-y-0 left-3 flex items-center text-gray-300">
+                #
+              </span>
+              <input
+                type="text"
+                value={hexValue}
+                onChange={handleHexChange}
+                className="w-full rounded border border-gray-600 bg-gray-700 px-3 py-2 pl-7 text-white"
+                maxLength={6}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 // ////////////////////////////// Background Color ////////////////////////////// //
@@ -117,343 +684,6 @@ const ToolSettings = ({}: ToolSettingsProps) => {
   return <div>Tool Settings</div>;
 };
 
-// ////////////////////////////// All the required icons ////////////////////////////// //
-interface IconProps {
-  size?: number;
-  className?: string;
-}
-const Circle = ({ size = 24, className = "" }: IconProps) => {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <circle cx="12" cy="12" r="10" />
-    </svg>
-  );
-};
-const Download = ({ size = 24, className = "" }: IconProps) => {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-      <polyline points="7 10 12 15 17 10" />
-      <line x1="12" y1="15" x2="12" y2="3" />
-    </svg>
-  );
-};
-const Eraser = ({ size = 24, className = "" }: IconProps) => {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21" />
-      <path d="M22 21H7" />
-      <path d="m5 11 9 9" />
-    </svg>
-  );
-};
-const Layers = ({ size = 24, className = "" }: IconProps) => {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <polygon points="12 2 2 7 12 12 22 7 12 2" />
-      <polyline points="2 17 12 22 22 17" />
-      <polyline points="2 12 12 17 22 12" />
-    </svg>
-  );
-};
-const Paintbrush = ({ size = 24, className = "" }: IconProps) => {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <path d="M18.37 2.63 14 7l-1.59-1.59a2 2 0 0 0-2.82 0L8 7l9 9 1.59-1.59a2 2 0 0 0 0-2.82L17 10l4.37-4.37a2.12 2.12 0 1 0-3-3Z" />
-      <path d="M9 8c-2 3-4 3.5-7 4l8 10c2-1 6-5 6-7" />
-      <path d="M14.5 17.5 4.5 15" />
-    </svg>
-  );
-};
-const Palette = ({ size = 24, className = "" }: IconProps) => {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <circle cx="13.5" cy="6.5" r=".5" />
-      <circle cx="17.5" cy="10.5" r=".5" />
-      <circle cx="8.5" cy="7.5" r=".5" />
-      <circle cx="6.5" cy="12.5" r=".5" />
-      <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" />
-    </svg>
-  );
-};
-const Settings = ({ size = 24, className = "" }: IconProps) => {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-      <circle cx="12" cy="12" r="3" />
-    </svg>
-  );
-};
-const Square = ({ size = 24, className = "" }: IconProps) => {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-    </svg>
-  );
-};
-const Trash2 = ({ size = 24, className = "" }: IconProps) => {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <path d="M3 6h18" />
-      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-      <line x1="10" y1="11" x2="10" y2="17" />
-      <line x1="14" y1="11" x2="14" y2="17" />
-    </svg>
-  );
-};
-const Eye = ({ size = 24, className = "" }: IconProps) => {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-      <circle cx="12" cy="12" r="3" />
-    </svg>
-  );
-};
-const EyeOff = ({ size = 24, className = "" }: IconProps) => {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
-      <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
-      <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
-      <line x1="2" x2="22" y1="2" y2="22" />
-    </svg>
-  );
-};
-const Plus = ({ size = 24, className = "" }: IconProps) => {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <line x1="12" y1="5" x2="12" y2="19" />
-      <line x1="5" y1="12" x2="19" y2="12" />
-    </svg>
-  );
-};
-const X = ({ size = 24, className = "" }: IconProps) => {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <line x1="18" y1="6" x2="6" y2="18" />
-      <line x1="6" y1="6" x2="18" y2="18" />
-    </svg>
-  );
-};
-const ChevronLeft = ({ size = 24, className = "" }: IconProps) => {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <path d="m15 18-6-6 6-6" />
-    </svg>
-  );
-};
-
-// ////////////////////////////// Constants ////////////////////////////// //
-const TOOLS = [
-  { name: "brush", icon: Paintbrush, shortcut: "B" },
-  { name: "eraser", icon: Eraser, shortcut: "E" },
-  { name: "rectangle", icon: Square, shortcut: "R" },
-  { name: "circle", icon: Circle, shortcut: "C" },
-];
-const DRAWER_ITEMS = [
-  { item: "color", icon: Palette, title: "Color Palette" },
-  { item: "settings", icon: Settings, title: "Tool Settings" },
-  { item: "layers", icon: Layers, title: "Layers" },
-  {
-    item: "background",
-    icon: Palette,
-    title: "Background Color",
-    iconProps: { className: "fill-yellow-100" },
-  },
-];
-const colorPalette = [
-  // Row 1 - Grayscale
-  "#000000",
-  "#444444",
-  "#666666",
-  "#888888",
-  "#AAAAAA",
-  "#CCCCCC",
-  "#FFFFFF",
-  // Row 2 - Light colors
-  "#FFAAAA",
-  "#FFFFAA",
-  "#AAFFAA",
-  "#AAFFFF",
-  "#AAAAFF",
-  "#FFAAFF",
-  "#FFCCAA",
-  // Row 3 - Medium colors
-  "#FF5555",
-  "#FFFF55",
-  "#55FF55",
-  "#55FFFF",
-  "#5555FF",
-  "#FF55FF",
-  "#FFAA55",
-  // Row 4 - Dark colors
-  "#FF0000",
-  "#FFFF00",
-  "#00FF00",
-  "#00FFFF",
-  "#0000FF",
-  "#FF00FF",
-  "#FF8800",
-];
-
-// ////////////////////////////// Types ////////////////////////////// //
-type DrawerItem = (typeof DRAWER_ITEMS)[number]["item"];
-
 // ////////////////////////////// Main Component ////////////////////////////// //
 const CanvasKit = () => {
   // Canvas state
@@ -476,31 +706,12 @@ const CanvasKit = () => {
     [],
   );
 
-  // Handle drawer open/close
-  const openDrawer = (
-    drawer: DrawerItem,
-    fromDrawer: DrawerItem | null = null,
-  ) => {
-    if (activeDrawer && fromDrawer === null) {
-      setPreviousDrawer(activeDrawer);
-    } else if (fromDrawer) {
-      setPreviousDrawer(fromDrawer);
-    }
-    setActiveDrawer(drawer);
-  };
-
   // Create drawer content with access to state
   const DRAWER = DRAWER_ITEMS.map((item) => {
     let content;
 
     if (item.item === "color") {
-      content = (
-        <ColorPalette
-          color={color}
-          setColor={setColor}
-          colorPalette={colorPalette}
-        />
-      );
+      content = <ColorPalette color={color} setColor={setColor} />;
     } else if (item.item === "settings") {
       content = (
         <ToolSettings
@@ -540,6 +751,18 @@ const CanvasKit = () => {
       content,
     };
   });
+  // Handle drawer open/close
+  const openDrawer = (
+    drawer: DrawerItem,
+    fromDrawer: DrawerItem | null = null,
+  ) => {
+    if (activeDrawer && fromDrawer === null) {
+      setPreviousDrawer(activeDrawer);
+    } else if (fromDrawer) {
+      setPreviousDrawer(fromDrawer);
+    }
+    setActiveDrawer(drawer);
+  };
   const closeDrawer = () => {
     setActiveDrawer(null);
     setPreviousDrawer(null);
