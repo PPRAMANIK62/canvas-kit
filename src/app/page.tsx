@@ -298,15 +298,10 @@ const TOOLS = [
   { item: "circle", icon: Circle, shortcut: "C" },
 ] as const;
 const DRAWER_ITEMS = [
-  { item: "color", icon: Palette, title: "Color Palette", iconProps: {} },
-  { item: "settings", icon: Settings, title: "Tool Settings", iconProps: {} },
-  { item: "layers", icon: Layers, title: "Layers", iconProps: {} },
-  {
-    item: "background",
-    icon: Palette,
-    title: "Background Color",
-    iconProps: { className: "fill-yellow-100" },
-  },
+  { item: "color", icon: Palette, title: "Color Palette" },
+  { item: "settings", icon: Settings, title: "Tool Settings" },
+  { item: "layers", icon: Layers, title: "Layers" },
+  { item: "background", icon: Palette, title: "Background Color" },
 ] as const;
 const COLOR_PALLETE = [
   // Row 1 - Grayscale
@@ -670,27 +665,110 @@ const ColorPalette = ({ color, setColor }: ColorPaletteProps) => {
 };
 
 // ////////////////////////////// Background Color ////////////////////////////// //
-type BackgroundColorProps = {
+type BackgroundColorDrawerProps = {
   backgroundColor: string;
   setBackgroundColor: (color: string) => void;
 };
-const BackgroundColor = ({}: BackgroundColorProps) => {
-  return <div>Background Color</div>;
+const BackgroundColorDrawer = ({
+  backgroundColor,
+  setBackgroundColor,
+}: BackgroundColorDrawerProps) => {
+  return <ColorPalette color={backgroundColor} setColor={setBackgroundColor} />;
 };
 
 // ////////////////////////////// Layers ////////////////////////////// //
 type LayersPanelProps = {
-  layers: string[];
-  activeLayer: string;
-  setActiveLayer: (layer: string) => void;
-  toggleLayerVisibility: (layer: string) => void;
-  removeLayer: (layer: string) => void;
+  layers: Layer[];
+  activeLayer: number;
+  setActiveLayer: (id: number) => void;
+  toggleLayerVisibility: (id: number) => void;
+  removeLayer: (id: number) => void;
   addLayer: () => void;
   backgroundColor: string;
   openBackgroundColorDrawer: () => void;
 };
-const LayersPanel = ({}: LayersPanelProps) => {
-  return <div>Layers</div>;
+const LayersPanel = ({
+  layers,
+  activeLayer,
+  setActiveLayer,
+  toggleLayerVisibility,
+  removeLayer,
+  addLayer,
+  backgroundColor,
+  openBackgroundColorDrawer,
+}: LayersPanelProps) => {
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-medium">Layers</span>
+        <button
+          onClick={addLayer}
+          className="rounded-full p-1 transition-colors hover:bg-gray-700"
+        >
+          <Plus size={18} />
+        </button>
+      </div>
+
+      <div className="mt-2 space-y-2">
+        {layers.map((layer) => (
+          <div
+            key={layer.id}
+            className={`flex items-center justify-between rounded p-2 ${
+              activeLayer === layer.id ? "bg-gray-700" : "hover:bg-gray-700"
+            } cursor-pointer transition-colors`}
+            onClick={() => setActiveLayer(layer.id)}
+          >
+            <div className="flex items-center gap-2">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleLayerVisibility(layer.id);
+                }}
+                className="cursor-pointer"
+              >
+                {layer.visible ? <Eye size={16} /> : <EyeOff size={16} />}
+              </button>
+              <div className="h-8 w-8 overflow-hidden rounded">
+                {layer.id === 1 ? (
+                  <div className="h-full w-full" style={{ backgroundColor }} />
+                ) : (
+                  <div className="h-full w-full border border-gray-500 bg-transparent" />
+                )}
+              </div>
+              <span
+                className={`text-sm ${!layer.visible ? "text-gray-500" : ""}`}
+              >
+                {layer.name}
+              </span>
+              {layer.id === 1 && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openBackgroundColorDrawer();
+                  }}
+                  className="ml-2 cursor-pointer text-gray-400 hover:text-white"
+                  title="Change background color"
+                >
+                  <Palette size={14} />
+                </button>
+              )}
+            </div>
+            {layer.id !== 1 && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  removeLayer(layer.id);
+                }}
+                className="text-gray-400 hover:text-red-400"
+              >
+                <X size={16} />
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 };
 
 // ////////////////////////////// Tool Settings ////////////////////////////// //
@@ -1286,9 +1364,9 @@ const CanvasKit = () => {
     } else if (item.item === "layers") {
       content = (
         <LayersPanel
-          layers={[]}
-          activeLayer={""}
-          setActiveLayer={() => {}}
+          layers={layers}
+          activeLayer={activeLayer}
+          setActiveLayer={setActiveLayer}
           toggleLayerVisibility={() => {}}
           removeLayer={() => {}}
           addLayer={() => {}}
@@ -1298,7 +1376,7 @@ const CanvasKit = () => {
       );
     } else if (item.item === "background") {
       content = (
-        <BackgroundColor
+        <BackgroundColorDrawer
           backgroundColor={backgroundColor}
           setBackgroundColor={setBackgroundColor}
         />
@@ -1386,20 +1464,22 @@ const CanvasKit = () => {
           ))}
           <Separator />
 
-          {DRAWER.map((drawer) => (
-            <button
-              key={drawer.item}
-              onClick={() => openDrawer(drawer.item)}
-              className={`rounded-lg p-3 ${
-                activeDrawer === drawer.item
-                  ? "bg-blue-100 text-blue-600"
-                  : "text-gray-700 hover:bg-gray-100"
-              } transition-colors`}
-              title={drawer.title}
-            >
-              <drawer.icon size={20} {...(drawer.iconProps ?? {})} />
-            </button>
-          ))}
+          {DRAWER.filter((drawer) => drawer.item !== "background").map(
+            (drawer) => (
+              <button
+                key={drawer.item}
+                onClick={() => openDrawer(drawer.item)}
+                className={`rounded-lg p-3 ${
+                  activeDrawer === drawer.item
+                    ? "bg-blue-100 text-blue-600"
+                    : "text-gray-700 hover:bg-gray-100"
+                } transition-colors`}
+                title={drawer.title}
+              >
+                <drawer.icon size={20} {...(drawer.iconProps ?? {})} />
+              </button>
+            ),
+          )}
           <Separator />
 
           <button
