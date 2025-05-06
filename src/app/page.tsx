@@ -1423,11 +1423,18 @@ const CanvasKit = () => {
       content,
     };
   });
-  // Handle drawer open/close
+  // Handle drawer open/close/toggle
   const openDrawer = (
     drawer: DrawerItem,
     fromDrawer: DrawerItem | null = null,
   ) => {
+    // If the drawer is already open and we're clicking the same drawer button, close it
+    if (activeDrawer === drawer && fromDrawer === null) {
+      closeDrawer();
+      return;
+    }
+
+    // Otherwise, handle as before
     if (activeDrawer && fromDrawer === null) {
       setPreviousDrawer(activeDrawer);
     } else if (fromDrawer) {
@@ -1468,6 +1475,51 @@ const CanvasKit = () => {
     setLayers([...newLayers]);
   };
 
+  // Save canvas as image
+  const saveAsImage = useCallback(() => {
+    // Create a temporary canvas to merge all visible layers
+    const tempCanvas = document.createElement("canvas");
+    const visibleLayers = layers.filter(
+      (layer) => layer.visible && layer.canvas,
+    );
+    if (visibleLayers.length === 0) return;
+
+    const firstLayer = visibleLayers[0]!;
+    if (!firstLayer.canvas) return;
+
+    // Set the size of the temp canvas to match the layer canvases
+    tempCanvas.width = firstLayer.canvas.width;
+    tempCanvas.height = firstLayer.canvas.height;
+
+    const tempCtx = tempCanvas.getContext("2d");
+    if (!tempCtx) return;
+
+    // Draw all visible layers onto the temp canvas
+    visibleLayers.forEach((layer) => {
+      if (layer.canvas) {
+        tempCtx.drawImage(layer.canvas, 0, 0);
+      }
+    });
+
+    try {
+      // Create a temporary link element
+      const link = document.createElement("a");
+      link.download = `canvas-kit-${new Date().toISOString().slice(0, 10)}.png`;
+
+      // Convert canvas to data URL
+      const dataUrl = tempCanvas.toDataURL("image/png");
+      link.href = dataUrl;
+
+      // Append to body, click, and remove
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Error saving image:", error);
+      alert("There was an error saving your image. Please try again.");
+    }
+  }, [layers]);
+
   return (
     <div className="flex h-screen flex-col bg-gray-50">
       {/* Navbar */}
@@ -1482,7 +1534,7 @@ const CanvasKit = () => {
 
           <div className="flex items-center gap-2">
             <button
-              // onClick={saveAsImage}
+              onClick={saveAsImage}
               className="flex items-center gap-1.5 rounded-lg bg-blue-500 px-3 py-1.5 text-white transition-colors hover:bg-blue-600"
             >
               <Download size={16} />
@@ -1524,7 +1576,7 @@ const CanvasKit = () => {
                 } transition-colors`}
                 title={drawer.title}
               >
-                <drawer.icon size={20} {...(drawer.iconProps ?? {})} />
+                <drawer.icon size={20} />
               </button>
             ),
           )}
