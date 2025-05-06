@@ -290,6 +290,46 @@ const ChevronLeft = ({ size = 24, className = "" }: IconProps) => {
   );
 };
 
+const Undo = ({ size = 24, className = "" }: IconProps) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M3 7v6h6" />
+      <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13" />
+    </svg>
+  );
+};
+
+const Redo = ({ size = 24, className = "" }: IconProps) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M21 7v6h-6" />
+      <path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13" />
+    </svg>
+  );
+};
+
 // ////////////////////////////// Constants ////////////////////////////// //
 const TOOLS = [
   { item: "brush", icon: Paintbrush, shortcut: "B" },
@@ -861,6 +901,7 @@ type CanvasProps = {
   eraserSize: number;
   opacity: number;
   onLayerChange: (layers: Layer[]) => void;
+  onDrawingComplete?: () => void;
   cursorStyle: string;
 };
 const Canvas = ({
@@ -873,6 +914,7 @@ const Canvas = ({
   eraserSize,
   opacity,
   onLayerChange,
+  onDrawingComplete,
   cursorStyle,
 }: CanvasProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -1148,6 +1190,11 @@ const Canvas = ({
         tempContext.clearRect(0, 0, containerSize.width, containerSize.height);
       }
     }
+
+    // Notify parent that drawing is complete
+    if (onDrawingComplete) {
+      onDrawingComplete();
+    }
   }, [
     isDrawing,
     tool,
@@ -1156,6 +1203,7 @@ const Canvas = ({
     layers,
     activeLayerId,
     containerSize,
+    onDrawingComplete,
   ]);
 
   // Reference to the visible temp canvas element
@@ -1306,6 +1354,13 @@ type Layer = {
   canvas: HTMLCanvasElement | null;
   context: CanvasRenderingContext2D | null;
 };
+// Define a type for our history state
+type HistoryState = {
+  layers: Layer[];
+  activeLayer: number;
+  backgroundColor: string;
+};
+
 const CanvasKit = () => {
   // Canvas state
   const [tool, setTool] = useState<ToolItems>("brush");
@@ -1322,6 +1377,11 @@ const CanvasKit = () => {
   // Layers state
   const [layers, setLayers] = useState<Layer[]>(LAYERS);
   const [activeLayer, setActiveLayer] = useState(2);
+
+  // History state for undo/redo
+  const [history, setHistory] = useState<HistoryState[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+  const [isUndoRedo, setIsUndoRedo] = useState(false);
 
   // Layer functions
   const addLayer = useCallback(() => {
@@ -1457,6 +1517,94 @@ const CanvasKit = () => {
     }
   };
 
+  // Save current state to history
+  const saveToHistory = useCallback(() => {
+    if (isUndoRedo) return; // Don't save if we're in the middle of an undo/redo operation
+
+    // Create deep copies of the layers to store in history
+    const layersCopy = layers.map((layer) => {
+      // Create a new canvas for each layer
+      let newCanvas: HTMLCanvasElement | null = null;
+      let newContext: CanvasRenderingContext2D | null = null;
+
+      if (layer.canvas) {
+        newCanvas = document.createElement("canvas");
+        newCanvas.width = layer.canvas.width;
+        newCanvas.height = layer.canvas.height;
+
+        newContext = newCanvas.getContext("2d");
+        if (newContext && layer.canvas) {
+          newContext.drawImage(layer.canvas, 0, 0);
+        }
+      }
+
+      return {
+        ...layer,
+        canvas: newCanvas,
+        context: newContext,
+      };
+    });
+
+    // Create a new history state
+    const newState: HistoryState = {
+      layers: layersCopy,
+      activeLayer,
+      backgroundColor,
+    };
+
+    // If we're not at the end of the history, truncate it
+    const newHistory = history.slice(0, historyIndex + 1);
+
+    // Add the new state and update the index
+    setHistory([...newHistory, newState]);
+    setHistoryIndex(newHistory.length);
+  }, [history, historyIndex, layers, activeLayer, backgroundColor, isUndoRedo]);
+
+  // Initialize history with the initial state
+  useEffect(() => {
+    if (history.length === 0 && layers.some((layer) => layer.canvas)) {
+      saveToHistory();
+    }
+  }, [history.length, layers, saveToHistory]);
+
+  // Undo function
+  const handleUndo = useCallback(() => {
+    if (historyIndex > 0) {
+      setIsUndoRedo(true);
+
+      const prevState = history[historyIndex - 1];
+      if (prevState) {
+        setLayers(prevState.layers);
+        setActiveLayer(prevState.activeLayer);
+        setBackgroundColor(prevState.backgroundColor);
+
+        setHistoryIndex(historyIndex - 1);
+      }
+
+      // Reset the flag after state updates
+      setTimeout(() => setIsUndoRedo(false), 0);
+    }
+  }, [history, historyIndex]);
+
+  // Redo function
+  const handleRedo = useCallback(() => {
+    if (historyIndex < history.length - 1) {
+      setIsUndoRedo(true);
+
+      const nextState = history[historyIndex + 1];
+      if (nextState) {
+        setLayers(nextState.layers);
+        setActiveLayer(nextState.activeLayer);
+        setBackgroundColor(nextState.backgroundColor);
+
+        setHistoryIndex(historyIndex + 1);
+      }
+
+      // Reset the flag after state updates
+      setTimeout(() => setIsUndoRedo(false), 0);
+    }
+  }, [history, historyIndex]);
+
   // Clear canvas
   const clearCanvas = () => {
     // Reset background color to default white
@@ -1473,6 +1621,9 @@ const CanvasKit = () => {
 
     // Update the layers state with the new empty layers
     setLayers([...newLayers]);
+
+    // Save this state to history
+    setTimeout(() => saveToHistory(), 0);
   };
 
   // Save canvas as image
@@ -1583,6 +1734,27 @@ const CanvasKit = () => {
           <Separator />
 
           <button
+            onClick={handleUndo}
+            className="rounded-lg p-3 text-gray-700 transition-colors hover:bg-gray-100"
+            title="Undo"
+            disabled={historyIndex <= 0}
+          >
+            <Undo size={20} className={historyIndex <= 0 ? "opacity-50" : ""} />
+          </button>
+
+          <button
+            onClick={handleRedo}
+            className="rounded-lg p-3 text-gray-700 transition-colors hover:bg-gray-100"
+            title="Redo"
+            disabled={historyIndex >= history.length - 1}
+          >
+            <Redo
+              size={20}
+              className={historyIndex >= history.length - 1 ? "opacity-50" : ""}
+            />
+          </button>
+
+          <button
             onClick={clearCanvas}
             className="rounded-lg p-3 text-gray-700 transition-colors hover:bg-gray-100"
             title="Clear Canvas"
@@ -1602,7 +1774,10 @@ const CanvasKit = () => {
             brushSize={brushSize}
             eraserSize={eraserSize}
             opacity={opacity}
-            onLayerChange={setLayers}
+            onLayerChange={(newLayers) => {
+              setLayers(newLayers);
+            }}
+            onDrawingComplete={saveToHistory}
             cursorStyle={getCursorStyle()}
           />
         </div>
